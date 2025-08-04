@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>数据间隙排行榜</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+    nav { background-color: #333; position: sticky; top: 0; z-index: 1000; }
+    nav ul { list-style: none; display: flex; margin: 0; padding: 0; }
+    nav li { flex: 1; text-align: center; }
+    nav li a { display: block; padding: 14px 0; color: white; font-weight: bold; text-decoration: none; }
+    nav li a:hover { background-color: #444; }
+
+    .header-title {
+      text-align: center;
+      font-size: 32px;
+      font-weight: bold;
+      margin: 30px 0 20px 0;
+    }
+
+    .container {
+      display: flex;
+      justify-content: space-between;
+      padding: 20px;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .left, .center, .right {
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 6px rgba(0,0,0,0.1);
+      flex-grow: 1;
+    }
+
+    .left {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .center {
+      flex: 2;
+    }
+
+    .right {
+      flex: 1.5;
+    }
+
+    .section {
+      background: white;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+    }
+
+    .section h3 {
+      margin-top: 0;
+      color: #333;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 5px;
+      text-align: center;
+    }
+
+    iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+    }
+
+    .password-box {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .password-box input[type="password"] {
+      padding: 6px;
+      font-size: 14px;
+    }
+    .password-box button {
+      padding: 6px 12px;
+      font-size: 14px;
+      margin-left: 6px;
+      cursor: pointer;
+    }
+
+    .blurred-placeholder {
+      width: 100%;
+      height: 600px;
+      background: repeating-linear-gradient(
+        45deg,
+        #ccc,
+        #ccc 10px,
+        #eee 10px,
+        #eee 20px
+      );
+      filter: blur(3px);
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <ul>
+      <li><a href="Home.html">首页</a></li>
+      <li><a href="DarkZone.html">暗域</a></li>
+      <li><a href="DataCrevice.html">数据间隙</a></li>
+      <li><a href="TideOfAshes.html">灰烬之潮</a></li>
+      <li><a href="SecretSociety.html">秘盟招募</a></li>
+      <li><a href="Events.html">秘盟活动</a></li>
+    </ul>
+  </nav>
+
+  <div class="header-title">数据间隙</div>
+
+  <div class="password-box">
+    <input type="password" id="pw" placeholder="请输入密码查看排行榜">
+    <button onclick="verifyPassword()">提交</button>
+  </div>
+
+  <div class="container">
+
+    <!-- 左栏 -->
+    <div class="left">
+      <div class="section">
+        <h3>玩法介绍</h3>
+        <p>数据间隙是绑定【重构系统】的玩法，是获取重构材料的最重要的途径之一。数据间隙每8周为1个周期，每期又分为上半期和下半期，其中下半期有勋章奖励。</p>
+      </div>
+      <div class="section">
+        <h3>本期时间</h3>
+          <p>至8月13日</p>
+      </div>
+      <div class="section">
+        <h3>奖励汇总(每4周)</h3>
+        <ul>
+          <li>异方晶：1260</li>
+          <li>重构兑换币：4700</li>
+          <li>勋章：1（仅下半期）</li>
+        </ul>
+      </div>
+      <div class="section">
+        <h3>代打价格</h3>
+        <ul>
+          <li>盟内：10r全包</li>
+          <li>盟外：15r全包</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 中栏：腾讯文档攻略 -->
+    <div class="center section">
+      <h3>玩法攻略</h3>
+      <iframe src="https://docs.qq.com/aio/DZXBPdEJBYUJzbHN3"></iframe>
+    </div>
+
+    <!-- 右栏：排行榜，密码验证前为模糊占位 -->
+    <div class="right section">
+      <h3>盟内排行榜</h3>
+      <div id="rank-container">
+        <div class="blurred-placeholder"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function verifyPassword() {
+      const pw = document.getElementById('pw').value;
+      fetch('http://localhost:3000/check-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pw })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.valid) {
+          const container = document.getElementById('rank-container');
+          const iframe = document.createElement('iframe');
+          iframe.src = 'http://localhost:3000/secure-sheet';
+          container.innerHTML = '';
+          container.appendChild(iframe);
+        } else {
+          alert('密码错误，请重试');
+        }
+      })
+      .catch(() => {
+        alert('无法连接服务器');
+      });
+    }
+  </script>
+
+</body>
+</html>
