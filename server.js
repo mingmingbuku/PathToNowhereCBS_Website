@@ -1,29 +1,29 @@
 const express = require('express');
+const path = require('path');
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, GET');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  next();
-});
 
-// 密码验证接口
+// 静态资源托管（HTML 页面）
+app.use(express.static(path.join(__dirname, 'public')));
+
 app.post('/check-password', (req, res) => {
   const { password } = req.body;
   res.json({ valid: password === '666' });
 });
 
-// 排行榜 HTML iframe 代理接口（成功验证后前端加载）
 app.get('/secure-sheet', (req, res) => {
-  const iframeHTML = `
-    <iframe src="https://docs.qq.com/document/DZVpCTkZ0aHVvWEtX?tab=000002"
-            width="100%" height="600" frameborder="0"></iframe>
-  `;
-  res.setHeader('Content-Type', 'text/html');
-  res.send(iframeHTML);
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="zh">
+    <head><meta charset="UTF-8"><title>排行榜</title></head>
+    <body style="margin:0;padding:0;">
+      <iframe src="https://docs.qq.com/document/DZVpCTkZ0aHVvWEtX?tab=000002"
+              style="width:100%; height:100vh; border:none;"></iframe>
+    </body>
+    </html>
+  `);
 });
 
 app.listen(PORT, () => {
